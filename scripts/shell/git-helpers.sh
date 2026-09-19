@@ -170,7 +170,7 @@ grw() {
 # Move to the primary default-branch worktree, remove linked worktrees, then
 # update the default branch and delete merged local branches no longer in use.
 gr() {
-  local default_branch primary_wt
+  local default_branch default_wt primary_status primary_wt
 
   git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
     echo "gr: not inside a Git worktree" >&2
@@ -181,6 +181,22 @@ gr() {
   cd -- "$primary_wt" || return 1
 
   default_branch="$(_windows_setup_default_branch)" || return 1
+
+  default_wt="$(git for-each-ref \
+    --format='%(worktreepath)' \
+    "refs/heads/$default_branch"
+  )"
+
+  if [[ -n "$default_wt" && ! "$default_wt" -ef "$primary_wt" ]]; then
+    primary_status="$(git status --porcelain)" || return 1
+    if [[ -n "$primary_status" ]]; then
+      echo "gr: primary worktree has changes; cannot safely relocate '$default_branch'" >&2
+      return 1
+    fi
+
+    git -C "$default_wt" switch --detach || return 1
+  fi
+
   git switch -- "$default_branch" || return 1
 
   grw && grb
