@@ -245,8 +245,9 @@ test_gr_combines_worktree_and_branch_cleanup() {
   merged_wt="$tmp_root/gr merged"
   unmerged_wt="$tmp_root/gr unmerged"
 
-  git -C "$repo" worktree add --quiet -b merged-linked "$merged_wt"
-  git -C "$repo" worktree add --quiet -b unmerged-linked "$unmerged_wt"
+  git -C "$repo" switch --quiet -c primary-feature
+  git -C "$repo" worktree add --quiet -b merged-linked "$merged_wt" main
+  git -C "$repo" worktree add --quiet -b unmerged-linked "$unmerged_wt" main
   printf 'unmerged\n' >"$unmerged_wt/unmerged.txt"
   git -C "$unmerged_wt" add unmerged.txt
   git -C "$unmerged_wt" commit --quiet -m unmerged
@@ -256,14 +257,97 @@ test_gr_combines_worktree_and_branch_cleanup() {
   gr
 
   [[ "$PWD" -ef "$repo" ]] || fail 'gr did not finish in the primary worktree'
+  [[ "$(git branch --show-current)" == main ]] || fail 'gr did not switch the primary worktree to main'
   [[ ! -e "$merged_wt" && ! -e "$unmerged_wt" ]] || fail 'gr left a linked worktree'
+  assert_no_ref "$repo" refs/heads/primary-feature
   assert_no_ref "$repo" refs/heads/merged-linked
   assert_ref "$repo" refs/heads/unmerged-linked
   [[ "$(git -C "$repo" rev-parse main)" == "$(git -C "$repo" rev-parse origin/main)" ]] || fail 'gr did not update checked-out main'
 }
 
+test_gr_relocates_default_branch_from_linked_worktree() {
+  local repo default_wt unmerged_wt
+  repo="$(new_repo gr-default-linked)"
+  default_wt="$tmp_root/gr default linked"
+  unmerged_wt="$tmp_root/gr default linked unmerged"
+
+  git -C "$repo" switch --quiet -c primary-feature
+  git -C "$repo" worktree add --quiet "$default_wt" main
+  git -C "$repo" worktree add --quiet -b unmerged-linked "$unmerged_wt" main
+  printf 'unmerged\n' >"$unmerged_wt/unmerged.txt"
+  git -C "$unmerged_wt" add unmerged.txt
+  git -C "$unmerged_wt" commit --quiet -m unmerged
+
+  cd -- "$default_wt"
+  gr
+
+  [[ "$PWD" -ef "$repo" ]] || fail 'gr did not move from the default branch linked worktree to the primary worktree'
+  [[ "$(git branch --show-current)" == main ]] || fail 'gr did not relocate main to the primary worktree'
+  [[ ! -e "$default_wt" && ! -e "$unmerged_wt" ]] || fail 'gr left a linked worktree after relocating main'
+  assert_no_ref "$repo" refs/heads/primary-feature
+  assert_ref "$repo" refs/heads/unmerged-linked
+}
+
+test_gr_leaves_locked_default_worktree_detached() {
+  local repo default_wt rc
+  repo="$(new_repo gr-default-linked-locked)"
+  default_wt="$tmp_root/gr default linked locked"
+
+  git -C "$repo" switch --quiet -c primary-feature
+  git -C "$repo" worktree add --quiet "$default_wt" main
+  git -C "$repo" worktree lock --reason test "$default_wt"
+
+  cd -- "$repo"
+  set +e
+  gr >/dev/null 2>&1
+  rc=$?
+  set -e
+
+  [[ $rc -ne 0 ]] || fail 'gr ignored a locked default branch worktree'
+  [[ "$(git branch --show-current)" == main ]] || fail 'gr did not relocate main before encountering a locked worktree'
+  [[ -d "$default_wt" ]] || fail 'gr removed a locked default branch worktree'
+  [[ -z "$(git -C "$default_wt" branch --show-current)" ]] || fail 'gr left main checked out in both worktrees'
+  assert_ref "$repo" refs/heads/primary-feature
+
+  git -C "$repo" worktree unlock "$default_wt"
+  git -C "$repo" worktree remove --force "$default_wt"
+}
+
+test_gr_stops_before_cleanup_when_switch_fails() {
+  local repo linked_wt grw_marker grb_marker rc
+  repo="$(new_repo gr-switch-failure)"
+  linked_wt="$tmp_root/gr switch failure linked"
+  grw_marker="$tmp_root/grw-called-after-switch-failure"
+  grb_marker="$tmp_root/grb-called-after-switch-failure"
+
+  git -C "$repo" switch --quiet -c primary-feature
+  printf 'feature\n' >"$repo/file.txt"
+  git -C "$repo" commit --quiet -am feature
+  printf 'dirty\n' >"$repo/file.txt"
+  git -C "$repo" worktree add --quiet "$linked_wt" main
+
+  cd -- "$linked_wt"
+  set +e
+  (
+    grw() { touch "$grw_marker"; }
+    grb() { touch "$grb_marker"; }
+    gr >/dev/null 2>&1
+  )
+  rc=$?
+  set -e
+
+  [[ $rc -ne 0 ]] || fail 'gr ignored a default branch switch failure'
+  [[ "$(git -C "$repo" branch --show-current)" == primary-feature ]] || fail 'gr changed the primary branch after a switch failure'
+  [[ -d "$linked_wt" ]] || fail 'gr removed a linked worktree after a switch failure'
+  [[ "$(git -C "$linked_wt" branch --show-current)" == main ]] || fail 'gr detached the default branch before rejecting a dirty primary worktree'
+  [[ ! -e "$grw_marker" && ! -e "$grb_marker" ]] || fail 'gr started cleanup after a switch failure'
+}
+
 test_gr_stops_when_grw_fails() {
-  local marker="$tmp_root/grb-called" rc
+  local repo marker="$tmp_root/grb-called" rc
+
+  repo="$(new_repo grw-failure)"
+  cd -- "$repo"
 
   set +e
   (
@@ -372,6 +456,9 @@ test_grw_removes_linked_worktrees
 test_grw_refuses_non_main_primary
 test_grw_noop
 test_gr_combines_worktree_and_branch_cleanup
+test_gr_relocates_default_branch_from_linked_worktree
+test_gr_leaves_locked_default_worktree_detached
+test_gr_stops_before_cleanup_when_switch_fails
 test_gr_stops_when_grw_fails
 test_non_main_default_branch
 test_changed_remote_default_ignores_stale_origin_head

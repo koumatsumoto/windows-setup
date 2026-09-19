@@ -20,7 +20,7 @@ nav_section: reference
 - `fnm env --use-on-cd --shell bash` による Node.js の切り替え
 - `gr` / `grb` / `grw` Git helper の読み込み
 
-`gr` は `grw`、`grb` の順に実行し、linked worktreeの削除、既定branchの更新、マージ済みlocal branchの削除を1コマンドで行います。個別の操作には引き続き `grw` と `grb` を利用できます。
+`gr` はprimary worktreeへ移動して `origin` のremote HEADが示す既定branchへ切り替えた後、`grw`、`grb` の順に実行します。既定branchがlinked worktreeでcheckout済みの場合は、そのworktreeを同じcommitのdetached HEADにしてからprimary worktreeへbranchを移します。これにより、呼び出し元のlinked worktreeを含むlinked worktreeの削除、既定branchの更新、マージ済みlocal branchの削除を1コマンドで行います。未コミット変更などにより既定branchを安全に移せない場合は、cleanupを開始せず停止します。個別の操作には引き続き `grw` と `grb` を利用できます。
 
 `grb` は `origin` のremote HEADが示す現在の既定branchを安全にfast-forwardした後、その既定branchにマージ済みで、どのworktreeでも使用されていないローカルbranchだけを削除します。呼び出し元のbranchは切り替えません。localの既定branchがaheadまたはdivergedの場合は、branchを削除せず停止します。
 

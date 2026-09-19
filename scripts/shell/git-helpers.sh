@@ -21,6 +21,22 @@ _windows_setup_default_branch() {
   printf '%s\n' "${first_line%$'\t'HEAD}"
 }
 
+_windows_setup_primary_worktree() {
+  local field
+
+  while IFS= read -r -d '' field; do
+    case "$field" in
+      'worktree '*)
+        printf '%s\n' "${field#worktree }"
+        return 0
+        ;;
+    esac
+  done < <(git worktree list --porcelain -z)
+
+  echo "git helpers: could not determine the primary worktree" >&2
+  return 1
+}
+
 # Update the default branch by fast-forward, then delete merged local branches
 # that are not checked out in any worktree.
 grb() {
@@ -151,8 +167,37 @@ grw() {
   return "$rc"
 }
 
-# Remove linked worktrees before updating the default branch and deleting
-# merged local branches that are no longer in use.
+# Move to the primary default-branch worktree, remove linked worktrees, then
+# update the default branch and delete merged local branches no longer in use.
 gr() {
+  local default_branch default_wt primary_status primary_wt
+
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || {
+    echo "gr: not inside a Git worktree" >&2
+    return 1
+  }
+
+  primary_wt="$(_windows_setup_primary_worktree)" || return 1
+  cd -- "$primary_wt" || return 1
+
+  default_branch="$(_windows_setup_default_branch)" || return 1
+
+  default_wt="$(git for-each-ref \
+    --format='%(worktreepath)' \
+    "refs/heads/$default_branch"
+  )"
+
+  if [[ -n "$default_wt" && ! "$default_wt" -ef "$primary_wt" ]]; then
+    primary_status="$(git status --porcelain)" || return 1
+    if [[ -n "$primary_status" ]]; then
+      echo "gr: primary worktree has changes; cannot safely relocate '$default_branch'" >&2
+      return 1
+    fi
+
+    git -C "$default_wt" switch --detach || return 1
+  fi
+
+  git switch -- "$default_branch" || return 1
+
   grw && grb
 }
