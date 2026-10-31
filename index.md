@@ -35,3 +35,4 @@ nav_hidden: true
 - [Git の最小設定]({{ '/docs/05-DEV-TOOL-CONFIG/' | relative_url }})
 - [管理対象のシェル初期化]({{ '/docs/06-SHELL-CONFIG/' | relative_url }})
 - [Windows Terminal の最小設定]({{ '/docs/07-WINDOWS-TERMINAL/' | relative_url }})
+- [既存環境の整理と Ubuntu の入れ替え]({{ '/docs/09-CLEANUP-AND-WSL-REINSTALL/' | relative_url }})
