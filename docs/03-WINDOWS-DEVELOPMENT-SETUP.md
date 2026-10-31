@@ -66,6 +66,32 @@ wsl -d Ubuntu-26.04
 
 [Microsoft の WSL コマンド](https://learn.microsoft.com/en-us/windows/wsl/basic-commands)では `wsl --list --online` で配布名を確認し、`wsl --install -d <Distro>` で明示導入できます。このガイドは可変の `Ubuntu` ではなく `Ubuntu-26.04` を固定します。
 
+### メトリクス収集を OFF にする
+
+初回起動で `Would you like to opt-in to platform metrics collection (Y/n)?` と聞かれたら、`n` を入力します。Enter だけで同意しないようにします。
+
+すでに同意した場合は、Ubuntu 内で作成済みのユーザー `kou` として次を実行します。同意設定はユーザーごとなので、`sudo` は付けません。
+
+```bash
+ubuntu-insights consent linux wsl_setup ubuntu_release_upgrader --state=false
+ubuntu-insights consent linux wsl_setup ubuntu_release_upgrader
+```
+
+`linux`、`wsl_setup`、`ubuntu_release_upgrader` がすべて `false` であることを確認します。
+
+今後作成する Ubuntu インスタンスも OFF を既定にする場合は、Windows の通常の PowerShell で次を実行します。
+
+```powershell
+$key = 'HKCU:\Software\Canonical\Ubuntu'
+if (-not (Test-Path -LiteralPath $key)) {
+    New-Item -Path $key -Force | Out-Null
+}
+New-ItemProperty -Path $key -Name UbuntuInsightsConsent -PropertyType DWord -Value 0 -Force | Out-Null
+Get-ItemPropertyValue -Path $key -Name UbuntuInsightsConsent
+```
+
+最後の出力が `0` であることを確認します。この Windows 側の値は初期設定時にだけ参照されるため、既存インスタンスには Ubuntu 内のコマンドで変更します。OFF にしても、収集を拒否したことを示す通知だけは送られます。詳細は [Ubuntu のデータ収集と同意設定](https://ubuntu.com/wsl/docs/stable/explanation/data-collection/)を参照してください。
+
 ## 4. Docker Desktop を WSL と接続する
 
 1. Docker Desktop を起動する。
