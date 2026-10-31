@@ -23,7 +23,7 @@ nav_hidden: true
 - Windows プロファイルは `C:\Users\kou`、既知のフォルダーの実パスは `Documents`、`Desktop`、`Downloads`、`Pictures` の英語名である。
 - 日本語表示・地域・システムロケール・日本語キーボードと、個人用 IME キー設定が復旧している。
 - OneDrive はアプリを残し、未サインイン、フォルダーバックアップ無効、自動起動無効である。
-- Windows 側は VS Code、Docker Desktop、Chrome、PowerToys のみをこのガイドで導入する。
+- Windows 側は VS Code、Docker Desktop、Chrome のみをこのガイドで導入する。LG gram のキー置き換えには Windows 標準設定を使い、PowerToys は導入しない。
 - VS Code の WSL 拡張 `ms-vscode-remote.remote-wsl` を導入し、Ubuntu から WSL window を開ける。
 - WSL 2 の `Ubuntu-26.04` で Git / GitHub、Node.js / TypeScript、Python / uv、Docker、Playwright、Codex、Claude Code が使える。
 - Playwright Test はプロジェクトの依存と lockfile で管理し、AI エージェント用 `playwright-cli` だけをグローバル導入する。

@@ -17,7 +17,7 @@ Windows の設定 → システム → ストレージと、設定 → アプリ
 - Windows 版 VS Code、WSL 拡張、ユーザー設定は、WSL 接続を続けるために残す。
 - Docker Desktop 本体と WSL 2 の基盤は、Docker を使う場合に残す。
 - `.codex`、認証情報、SSH 鍵、作業リポジトリは、アプリのキャッシュと区別する。
-- PowerToys の Keyboard Manager など、使っている機能があるアプリを残す。
+- LG gram のキー置き換えだけに使っていた PowerToys は、[Windows 標準設定への移行と再起動後の実入力確認]({{ '/docs/02-WINDOWS-SETUP/' | relative_url }}) が済めば削除できる。他の機能を使っている場合は利用状況を確認する。
 - ドライバー、共有ランタイム、Windows の更新・セキュリティ機能は、一括削除の対象にしない。
 
 個人文書や Downloads は中身を確認します。クラウド同期フォルダーやリンク先を含むフォルダーの一括削除は避けます。

@@ -4,6 +4,5 @@
         @{ Id = 'Microsoft.VisualStudioCode'; Name = 'Visual Studio Code' }
         @{ Id = 'Docker.DockerDesktop'; Name = 'Docker Desktop' }
         @{ Id = 'Google.Chrome'; Name = 'Google Chrome' }
-        @{ Id = 'Microsoft.PowerToys'; Name = 'PowerToys' }
     )
 }

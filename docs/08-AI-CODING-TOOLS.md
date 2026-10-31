@@ -68,7 +68,7 @@ Windows 側で ZIP 展開したリポジトリへ移動し、通常の PowerShel
 - 対象端末向けのサポート中の Windows 11 と通常更新が適用され、Windows Insider Program に参加していない。
 - Explorer に拡張子と隠しファイルが表示される。
 - VS Code に WSL 拡張があり、Ubuntu から開いた window に `WSL: Ubuntu-26.04` が表示される。
-- IME は `無変換 = オフ`、`変換 = オン`、`Ctrl + Space = なし`。
+- IME は `無変換 = オフ`、`変換 = オン/オフ切り替え`、`Ctrl + Space = なし`。対象の LG gram では、スペース右の「カタカナ／ひらがな／ローマ字」で切り替わり、PowerToys がなくても使える。
 - OneDrive は未サインイン、フォルダーバックアップ無効、自動起動無効。
 - `$env:USERPROFILE` と Known Folder は `C:\Users\kou` 直下。
 - Docker Desktop の WSL Integration は `Ubuntu-26.04` だけに必要な範囲で有効。
