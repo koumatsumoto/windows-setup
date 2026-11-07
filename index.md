@@ -26,6 +26,7 @@ nav_hidden: true
 - Windows 側は VS Code、Docker Desktop、Chrome のみをこのガイドで導入する。LG gram のキー置き換えには Windows 標準設定を使い、PowerToys は導入しない。
 - VS Code の WSL 拡張 `ms-vscode-remote.remote-wsl` を導入し、Ubuntu から WSL window を開ける。
 - WSL 2 の `Ubuntu-26.04` で Git / GitHub、Node.js / TypeScript、Python / uv、Docker、Playwright、Codex、Claude Code が使える。
+- WSL のリポジトリはホーム直下へ置く。
 - Playwright Test はプロジェクトの依存と lockfile で管理し、AI エージェント用 `playwright-cli` だけをグローバル導入する。
 
 ## 設定リファレンス

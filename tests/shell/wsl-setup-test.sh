@@ -52,3 +52,32 @@ fi
 TEST_GH_STATUS=1 bash "$repo/scripts/wsl/verify.sh" > "$test_dir/result" 2>&1 || true
 grep -Fq '[FAIL] GitHub CLI は未認証です。' "$test_dir/result"
 echo 'WSL Git verification tests PASS'
+
+# shellcheck disable=SC2016
+grep -Fq 'CODEX_NON_INTERACTIVE=1 sh "$tmp_dir/install-codex.sh"' "$repo/scripts/wsl/install-ai.sh"
+
+# Exercise runtime command selection without opening a real daemon or browser.
+mkdir -p "$test_dir/bin"
+cat > "$test_dir/bin/docker" <<'STUB'
+#!/usr/bin/env bash
+exit 0
+STUB
+cat > "$test_dir/bin/playwright-cli" <<'STUB'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$RUNTIME_LOG"
+if [[ "${2:-}" == open ]]; then
+  [[ "${3:-}" == about:blank && "${4:-}" == --browser && "${5:-}" == chromium ]] || exit 9
+  exit "${TEST_PLAYWRIGHT_EXIT:-0}"
+fi
+STUB
+chmod +x "$test_dir/bin/docker" "$test_dir/bin/playwright-cli"
+export RUNTIME_LOG="$test_dir/runtime-log"
+PATH="$test_dir/bin:$PATH" bash "$repo/scripts/wsl/verify-runtime.sh"
+grep -Fq ' open about:blank --browser chromium' "$RUNTIME_LOG"
+grep -Fq ' close' "$RUNTIME_LOG"
+: > "$RUNTIME_LOG"
+status=0
+PATH="$test_dir/bin:$PATH" TEST_PLAYWRIGHT_EXIT=7 bash "$repo/scripts/wsl/verify-runtime.sh" || status=$?
+[[ "$status" == 7 ]]
+grep -Fq ' close' "$RUNTIME_LOG"
+echo 'WSL runtime command tests PASS'

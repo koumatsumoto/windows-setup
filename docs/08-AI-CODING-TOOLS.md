@@ -32,12 +32,14 @@ Codex は [OpenAI の現行手順](https://learn.chatgpt.com/docs/codex/cli) に
 
 インストーラーは取得後に一度ファイルへ保存し、通信成功を確認してから実行します。固定バージョンのバイト単位再現ではなく、各ベンダーがサポートする更新経路を優先します。
 
+Codex のインストーラーは `CODEX_NON_INTERACTIVE=1` で実行し、導入直後の起動確認で待機しないようにします。CLI の起動と認証は次の節で行います。
+
 ## 2. 手動で認証する
 
 プロジェクトディレクトリから順に起動し、画面の案内に従います。
 
 ```bash
-cd ~/work/windows-setup
+cd ~/windows-setup
 codex
 claude
 ```

@@ -39,6 +39,7 @@ if [[ "$dry_run" == true ]]; then
   printf '[dry-run] global @playwright/cli@latest + Chromium\n'
   printf '[dry-run] managed shell fragment: ~/%s\n' "$MANAGED_ENV_RELATIVE_PATH"
   printf '[dry-run] managed Git helpers: ~/%s\n' "$MANAGED_GIT_HELPERS_RELATIVE_PATH"
+  printf '[dry-run] Windows default browser helper: ~/%s\n' "$MANAGED_BROWSER_RELATIVE_PATH"
   exit 0
 fi
 

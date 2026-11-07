@@ -54,6 +54,7 @@ jobs:
       - name: WSL verification and config sync tests
         run: |
           bash tests/shell/wsl-setup-test.sh
+          bash tests/shell/windows-browser-test.sh
           docker run --rm -e WINDOWS_SETUP_DISPOSABLE_TEST=1 \
             -v "$PWD:/app:ro" -w /app ubuntu:26.04 \
             bash tests/shell/sync-config-test.sh

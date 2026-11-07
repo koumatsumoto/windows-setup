@@ -39,7 +39,7 @@ trap 'rm -rf -- "$tmp_dir"' EXIT
 export PATH="$HOME/.local/bin:$PATH"
 
 curl -fsSL --retry 3 --retry-all-errors "$CODEX_INSTALL_URL" -o "$tmp_dir/install-codex.sh"
-sh "$tmp_dir/install-codex.sh"
+CODEX_NON_INTERACTIVE=1 sh "$tmp_dir/install-codex.sh"
 
 curl -fsSL --retry 3 --retry-all-errors "$CLAUDE_INSTALL_URL" -o "$tmp_dir/install-claude.sh"
 bash "$tmp_dir/install-claude.sh"

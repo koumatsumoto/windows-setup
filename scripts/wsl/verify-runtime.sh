@@ -9,7 +9,7 @@ trap close_browser EXIT
 
 docker info >/dev/null
 docker compose version >/dev/null
-playwright-cli "-s=$session" open about:blank >/dev/null
+playwright-cli "-s=$session" open about:blank --browser chromium >/dev/null
 playwright-cli "-s=$session" close >/dev/null
 trap - EXIT
 

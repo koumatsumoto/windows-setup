@@ -7,7 +7,8 @@ module SiteVerification
     '旧リポジトリ名' => /windows-setup-2026/i,
     '旧 AI CLI npm パッケージ' => /@(?:openai\/codex|anthropic-ai\/claude-code)\b/i,
     '廃止ツール' => /\b(?:qwen(?:-code)?|antigravity(?:-ai)?|gh-copilot|gh-markdown-preview|7-zip|7zip\.7zip|Oracle\.MySQLWorkbench|Logitech\.GHUB|Discord\.Discord|Microsoft\.Edit)\b/i,
-    'Windows 開発 CLI 導入' => /\b(?:Git\.Git|GitHub\.cli|Schniz\.fnm|Python\.Python\.\d+)\b/i
+    'Windows 開発 CLI 導入' => /\b(?:Git\.Git|GitHub\.cli|Schniz\.fnm|Python\.Python\.\d+)\b/i,
+    '旧 WSL 作業パス' => %r{(?:~|\$HOME|/home/kou)/work(?:/|\z|[\s`"'<>])}
   }.freeze
 
   def self.content_errors(text, label)

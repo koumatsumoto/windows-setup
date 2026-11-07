@@ -33,20 +33,21 @@ exec bash
 
 ## 2. リポジトリを WSL へ clone する
 
-Git の導入後は Windows の ZIP 展開先ではなく、Linux ファイルシステム内で作業します。
+Git の導入後は Windows の ZIP 展開先ではなく、Linux ファイルシステム内のホーム直下で作業します。このガイドは `~/windows-setup` を標準の配置先にします。
 
 ```bash
-mkdir -p ~/work
-cd ~/work
+cd ~
 git clone https://github.com/koumatsumoto/windows-setup.git
-cd windows-setup
+cd ~/windows-setup
 ```
 
-以後のコマンドはこの WSL 側コピーで実行します。
+以後のコマンドはこの WSL 側コピーで実行します。他のリポジトリもホーム直下へ clone します。WSL を初期化し直した場合も同じ配置で取得し直すため、端末ごとにパスを変える必要はありません。すでに同名ディレクトリがある場合は内容を確認し、既存の作業を削除・上書きしません。
 
 ## 3. Git と GitHub を設定する
 
 [Git の最小設定]({{ '/docs/05-DEV-TOOL-CONFIG/' | relative_url }}) で名前とメールアドレスを設定します。続いて認証します。
+
+基盤スクリプトは `~/.local/bin/windows-browser` を配置します。WSL から `powershell.exe` が使え、既存の `BROWSER` 設定がない場合は、新しいシェルで `BROWSER=windows-browser` を設定します。`BROWSER` に対応する CLI から HTTP / HTTPS のページを Windows の既定ブラウザーで開きます。
 
 ```bash
 gh auth login
@@ -55,17 +56,49 @@ gh auth setup-git
 
 トークン、SSH 鍵、認証済み設定はこのリポジトリへ保存しません。
 
-## 4. Node.js / TypeScript
+### ブラウザーが見つからない場合
 
-基盤スクリプトは Node.js LTS を導入して既定にします。各プロジェクトは `.node-version` または `.nvmrc` と lockfile を正本にします。
+`xdg-open,x-www-browser,www-browser,wslview` が見つからないエラーが出た場合は、管理対象の設定を同期し、新しいシェルで確認します。既存の WSL もこの手順で更新できます。
 
 ```bash
+cd ~/windows-setup
+git pull --ff-only
+./scripts/wsl/sync-config.sh
+exec bash
+command -v powershell.exe
+windows-browser https://github.com
+gh auth login
+gh auth setup-git
+```
+
+`windows-browser` は HTTP / HTTPS の URL を1つだけ受け取り、Windows PowerShell の `Start-Process` で既定ブラウザーを開きます。ファイルや独自 URL scheme、複数 URL、追加オプションには対応しません。URL はコードへ埋め込まず、base64 のデータとして標準入力へ渡します。
+
+[Windows interop](https://learn.microsoft.com/en-us/windows/wsl/filesystems) や `powershell.exe` の PATH が使えない場合は、その設定を確認してください。すぐに認証する場合は、GitHub CLI が表示した URL を Windows のブラウザーで手動で開き、同じ画面に表示されたコードを入力できます。既存の `BROWSER` は上書きしません。GitHub CLI 固有の [`GH_BROWSER` または `browser` 設定](https://cli.github.com/manual/gh_help_environment)がある場合はそちらが優先されます。
+
+## 4. Node.js / TypeScript
+
+Node.js のバージョン管理には [fnm](https://github.com/Schniz/fnm) を使います。基盤スクリプトは fnm の公式インストーラーを `--skip-shell` で実行し、シェル初期化はこのリポジトリの `env.sh` に集約します。続いて次の処理で、その時点の Node.js LTS を導入して既定にします。
+
+```bash
+fnm install --lts --use
+fnm default "$(fnm current)"
+```
+
+導入後は新しいシェルで確認します。
+
+```bash
+fnm --version
+fnm current
 node --version
 node -p 'process.release.lts'
 npm --version
 ```
 
-2行目が `null` ではなく LTS のコードネームを返すことを確認します。TypeScript などは各プロジェクトの `devDependencies` に追加し、グローバル導入しません。
+`node -p 'process.release.lts'` が `null` ではなく LTS のコードネームを返すことを確認します。
+
+新しいプロジェクトでは `.node-version` に Node.js のバージョンを記録し、依存は lockfile で固定します。既存プロジェクトに `.nvmrc` がある場合も fnm が読み取れるため、そのファイルを使えます。`.nvmrc` は互換のバージョン指定ファイル名であり、nvm の導入を求める記述ではありません。`env.sh` の `fnm env --use-on-cd --shell bash` が、ディレクトリ移動時にプロジェクトの指定を読み取ります。
+
+TypeScript などは各プロジェクトの `devDependencies` に追加し、グローバル導入しません。
 
 ## 5. Python / uv
 
@@ -102,11 +135,13 @@ npx playwright test
 ```bash
 playwright-cli --version
 playwright-cli --help
-playwright-cli -s=smoke open about:blank
+playwright-cli -s=smoke open about:blank --browser chromium
 playwright-cli -s=smoke close
 ```
 
 特定プロジェクトで生成 skill が必要になった場合だけ、その時点の CLI で `playwright-cli install --skills` を実行します。
+
+`open` では `--browser chromium` を明示し、導入済みの CLI 用 Chromium を使います。省略すると Linux 側の Google Chrome を探す場合があります。
 
 ## 7. read-only 検証
 

@@ -21,9 +21,12 @@ Dir.mktmpdir('verify-site-test-') do |root|
     check.call("<a href=\"#{link}\">bad</a>", false)
   end
   ['windows-setup-2026', '@openai/codex', '@anthropic-ai/claude-code', 'Qwen Code',
-   'Antigravity', 'gh-copilot', 'gh-markdown-preview', '7-Zip', 'Git.Git'].each do |text|
+   'Antigravity', 'gh-copilot', 'gh-markdown-preview', '7-Zip', 'Git.Git',
+   '~/work', '~/work/windows-setup', '$HOME/work/windows-setup',
+   '/home/kou/work/windows-setup'].each do |text|
     check.call("<code>#{text}</code>", false)
   end
+  check.call('<code>~/windows-setup ~/workflow ~/work-project</code>', true)
   check.call('<a href="https://example.com/windows-setup-2026/">old</a>', false)
   check.call(valid, true)
   FileUtils.mkdir_p(File.join(root, 'scripts/windows'))
