@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Environment changes in the source checks are intentionally subshell-local.
+# shellcheck disable=SC2030,SC2031
 set -euo pipefail
 
 repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
