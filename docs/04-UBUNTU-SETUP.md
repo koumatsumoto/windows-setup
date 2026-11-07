@@ -75,15 +75,28 @@ gh auth setup-git
 
 ## 4. Node.js / TypeScript
 
-基盤スクリプトは Node.js LTS を導入して既定にします。各プロジェクトは `.node-version` または `.nvmrc` と lockfile を正本にします。
+Node.js のバージョン管理には [fnm](https://github.com/Schniz/fnm) を使います。基盤スクリプトは fnm の公式インストーラーを `--skip-shell` で実行し、シェル初期化はこのリポジトリの `env.sh` に集約します。続いて次の処理で、その時点の Node.js LTS を導入して既定にします。
 
 ```bash
+fnm install --lts --use
+fnm default "$(fnm current)"
+```
+
+導入後は新しいシェルで確認します。
+
+```bash
+fnm --version
+fnm current
 node --version
 node -p 'process.release.lts'
 npm --version
 ```
 
-2行目が `null` ではなく LTS のコードネームを返すことを確認します。TypeScript などは各プロジェクトの `devDependencies` に追加し、グローバル導入しません。
+`node -p 'process.release.lts'` が `null` ではなく LTS のコードネームを返すことを確認します。
+
+新しいプロジェクトでは `.node-version` に Node.js のバージョンを記録し、依存は lockfile で固定します。既存プロジェクトに `.nvmrc` がある場合も fnm が読み取れるため、そのファイルを使えます。`.nvmrc` は互換のバージョン指定ファイル名であり、nvm の導入を求める記述ではありません。`env.sh` の `fnm env --use-on-cd --shell bash` が、ディレクトリ移動時にプロジェクトの指定を読み取ります。
+
+TypeScript などは各プロジェクトの `devDependencies` に追加し、グローバル導入しません。
 
 ## 5. Python / uv
 
