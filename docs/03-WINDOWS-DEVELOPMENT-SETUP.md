@@ -118,7 +118,7 @@ VS Code 導入後に開いた新しい通常の PowerShell で、[WSL 拡張](ht
 code --install-extension ms-vscode-remote.remote-wsl
 ```
 
-完了後、Ubuntu のホーム直下を作業の起点にして、次を実行します。プロジェクトは `~/windows-setup` や `~/satellite_system` のようにホーム直下へ置き、共通の作業フォルダーを1段追加しません。
+完了後、Ubuntu のホーム直下を作業の起点にして、次を実行します。リポジトリはホーム直下へ置き、共通の作業フォルダーを1段追加しません。
 
 ```bash
 cd ~
