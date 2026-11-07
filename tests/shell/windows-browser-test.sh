@@ -8,6 +8,7 @@ test_dir="$(mktemp -d)"
 trap 'rm -rf -- "$test_dir"' EXIT
 export HOME="$test_dir/home with spaces"
 export ARG_CAPTURE="$test_dir/arguments"
+export STDIN_CAPTURE="$test_dir/stdin"
 mkdir -p "$HOME/.local/bin" "$test_dir/bin" "$test_dir/empty"
 install -m 0755 "$repo/scripts/wsl/windows-browser.sh" "$HOME/.local/bin/windows-browser"
 browser="$HOME/.local/bin/windows-browser"
@@ -15,6 +16,9 @@ browser="$HOME/.local/bin/windows-browser"
 cat > "$test_dir/bin/powershell.exe" <<'STUB'
 #!/usr/bin/env bash
 printf '%s\0' "$@" > "$ARG_CAPTURE"
+if IFS= read -r line; then
+  printf '%s' "$line" > "$STDIN_CAPTURE"
+fi
 exit "${TEST_PS_EXIT:-0}"
 STUB
 chmod +x "$test_dir/bin/powershell.exe"
@@ -29,11 +33,13 @@ mapfile -d '' -t arguments < "$ARG_CAPTURE"
 [[ "${arguments[0]}" == -NoLogo && "${arguments[1]}" == -NoProfile ]]
 [[ "${arguments[2]}" == -NonInteractive && "${arguments[3]}" == -EncodedCommand ]]
 decoded="$(printf '%s' "${arguments[4]}" | base64 -d | iconv -f UTF-16LE -t UTF-8)"
-expected="Start-Process -FilePath 'https://example.com/?q=O''Reilly&x="
+expected="\$ProgressPreference = 'SilentlyContinue'; Start-Process -FilePath 'https://example.com/?q=O''Reilly&x="
 # shellcheck disable=SC2016
 expected+='$HOME;$(touch injected)`echo risky`#日本語'
 expected+="'"
 [[ "$decoded" == "$expected" ]]
+printf 'caller input\n' | "$browser" https://example.com
+[[ ! -e "$STDIN_CAPTURE" ]]
 
 for url in 'file:///tmp/test' 'javascript:alert(1)' 'https://' $'https://example.com/\nnext' $'https://example.com/\rnext' $'https://example.com/\tnext'; do
   rm -f "$ARG_CAPTURE"

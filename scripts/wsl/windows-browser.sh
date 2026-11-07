@@ -27,6 +27,7 @@ fi
 # Encode the whole command after quoting URL data as a PowerShell literal.
 # Never interpolate a URL into cmd.exe or an unquoted PowerShell expression.
 quoted_url="${url//\'/\'\'}"
-encoded_command="$(printf "Start-Process -FilePath '%s'" "$quoted_url" |
+encoded_command="$(printf "\$ProgressPreference = 'SilentlyContinue'; Start-Process -FilePath '%s'" "$quoted_url" |
   iconv -f UTF-8 -t UTF-16LE | base64 -w 0)"
-powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand "$encoded_command" >/dev/null
+# Windows console applications must not consume a caller's script input.
+powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand "$encoded_command" </dev/null >/dev/null
