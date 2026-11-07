@@ -47,7 +47,7 @@ cd ~/windows-setup
 
 [Git の最小設定]({{ '/docs/05-DEV-TOOL-CONFIG/' | relative_url }}) で名前とメールアドレスを設定します。続いて認証します。
 
-基盤スクリプトは `~/.local/bin/windows-browser` を配置します。WSL から `powershell.exe` が使え、既存の [`GH_BROWSER` / `BROWSER` 設定](https://cli.github.com/manual/gh_help_environment)がない場合は、新しいシェルで `GH_BROWSER=windows-browser` を設定します。GitHub CLI の HTTP / HTTPS 認証 URL を Windows の既定ブラウザーで開くための設定です。
+基盤スクリプトは `~/.local/bin/windows-browser` を配置します。WSL から `powershell.exe` が使え、既存の `BROWSER` 設定がない場合は、新しいシェルで `BROWSER=windows-browser` を設定します。`BROWSER` に対応する CLI から HTTP / HTTPS のページを Windows の既定ブラウザーで開きます。
 
 ```bash
 gh auth login
@@ -71,7 +71,9 @@ gh auth login
 gh auth setup-git
 ```
 
-`windows-browser` は HTTP / HTTPS の URL だけを受け取り、Windows PowerShell の `Start-Process` で既定ブラウザーを開きます。URL はコードへ埋め込まず、base64 のデータとして標準入力へ渡します。[Windows interop](https://learn.microsoft.com/en-us/windows/wsl/filesystems) や `powershell.exe` の PATH が使えない場合は、その設定を確認してください。すぐに認証する場合は、GitHub CLI が表示した URL を Windows のブラウザーで手動で開き、同じ画面に表示されたコードを入力できます。自分で `GH_BROWSER` または `BROWSER` を指定済みの場合は上書きしません。
+`windows-browser` は HTTP / HTTPS の URL を1つだけ受け取り、Windows PowerShell の `Start-Process` で既定ブラウザーを開きます。ファイルや独自 URL scheme、複数 URL、追加オプションには対応しません。URL はコードへ埋め込まず、base64 のデータとして標準入力へ渡します。
+
+[Windows interop](https://learn.microsoft.com/en-us/windows/wsl/filesystems) や `powershell.exe` の PATH が使えない場合は、その設定を確認してください。すぐに認証する場合は、GitHub CLI が表示した URL を Windows のブラウザーで手動で開き、同じ画面に表示されたコードを入力できます。既存の `BROWSER` は上書きしません。GitHub CLI 固有の [`GH_BROWSER` または `browser` 設定](https://cli.github.com/manual/gh_help_environment)がある場合はそちらが優先されます。
 
 ## 4. Node.js / TypeScript
 

@@ -19,7 +19,7 @@ nav_section: reference
 - `~/.local/bin`、fnm、Codex の実行パス
 - `fnm env --use-on-cd --shell bash` による Node.js の切り替え
 - `gr` / `grb` / `grw` Git helper の読み込み
-- WSL で `powershell.exe` が使え、既存の `GH_BROWSER` / `BROWSER` がない場合に GitHub CLI 用の `GH_BROWSER=windows-browser` を指定
+- WSL で `powershell.exe` が使え、既存の `BROWSER` がない場合に HTTP / HTTPS 用の `BROWSER=windows-browser` を指定
 
 `gr` はprimary worktreeへ移動して `origin` のremote HEADが示す既定branchへ切り替えた後、`grw`、`grb` の順に実行します。既定branchがlinked worktreeでcheckout済みの場合は、そのworktreeを同じcommitのdetached HEADにしてからprimary worktreeへbranchを移します。これにより、呼び出し元のlinked worktreeを含むlinked worktreeの削除、既定branchの更新、マージ済みlocal branchの削除を1コマンドで行います。未コミット変更などにより既定branchを安全に移せない場合は、cleanupを開始せず停止します。個別の操作には引き続き `grw` と `grb` を利用できます。
 

@@ -66,12 +66,20 @@ TEST_PS_EXIT=17 "$browser" https://example.com || status=$?
 
 # Never invoke a real runtime while sourcing the managed environment.
 fnm() { :; }
+gh() {
+  case "$*" in
+    browse) "${GH_BROWSER:-${TEST_CONFIGURED_BROWSER:-$BROWSER}}" https://example.com ;;
+    *) return 1 ;;
+  esac
+}
 (
   unset BROWSER GH_BROWSER
   export WSL_DISTRO_NAME=Ubuntu-26.04
   # shellcheck source=../../scripts/wsl/env.sh
   source "$repo/scripts/wsl/env.sh"
-  [[ "$GH_BROWSER" == windows-browser && -z "${BROWSER:-}" ]]
+  [[ "$BROWSER" == windows-browser && -z "${GH_BROWSER:-}" ]]
+  gh browse
+  [[ "$(base64 -d < "$STDIN_CAPTURE")" == https://example.com ]]
 )
 (
   unset GH_BROWSER
@@ -85,7 +93,14 @@ fnm() { :; }
   export GH_BROWSER=custom-gh-browser WSL_DISTRO_NAME=Ubuntu-26.04
   # shellcheck source=../../scripts/wsl/env.sh
   source "$repo/scripts/wsl/env.sh"
-  [[ "$GH_BROWSER" == custom-gh-browser && -z "${BROWSER:-}" ]]
+  [[ "$GH_BROWSER" == custom-gh-browser && "$BROWSER" == windows-browser ]]
+)
+(
+  unset BROWSER GH_BROWSER
+  export TEST_CONFIGURED_BROWSER=custom-config-browser WSL_DISTRO_NAME=Ubuntu-26.04
+  # shellcheck source=../../scripts/wsl/env.sh
+  source "$repo/scripts/wsl/env.sh"
+  [[ "$TEST_CONFIGURED_BROWSER" == custom-config-browser && "$BROWSER" == windows-browser && -z "${GH_BROWSER:-}" ]]
 )
 (
   unset BROWSER GH_BROWSER WSL_DISTRO_NAME
