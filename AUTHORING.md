@@ -54,6 +54,7 @@ done
 
 bash tests/shell/git-helpers-test.sh
 bash tests/shell/wsl-setup-test.sh
+bash tests/shell/windows-browser-test.sh
 ./bin/build-site
 ./bin/verify-site
 ./bin/verify-site --self-test

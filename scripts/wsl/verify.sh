@@ -60,6 +60,12 @@ else
   fail '管理対象の Git helper フラグメントがありません。'
 fi
 
+if [[ -x "$HOME/$MANAGED_BROWSER_RELATIVE_PATH" ]]; then
+  pass '管理対象の Windows ブラウザー helper を実行できます。'
+else
+  fail '管理対象の Windows ブラウザー helper がありません。'
+fi
+
 for helper_name in gr grb grw; do
   if declare -F "$helper_name" >/dev/null 2>&1; then
     pass "$helper_name function を利用できます。"

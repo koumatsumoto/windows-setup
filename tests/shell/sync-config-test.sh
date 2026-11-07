@@ -16,6 +16,8 @@ for _iteration in 1 2; do
   bash "$repo/scripts/wsl/sync-config.sh"
   cmp "$repo/scripts/wsl/env.sh" "$HOME/.config/windows-setup/env.sh"
   cmp "$repo/scripts/shell/git-helpers.sh" "$HOME/.config/windows-setup/git-helpers.sh"
+  cmp "$repo/scripts/wsl/windows-browser.sh" "$HOME/.local/bin/windows-browser"
+  [[ -x "$HOME/.local/bin/windows-browser" ]]
   cmp "$test_dir/bashrc" "$HOME/.bashrc"
 done
 if bash "$repo/scripts/wsl/sync-config.sh" --unknown; then

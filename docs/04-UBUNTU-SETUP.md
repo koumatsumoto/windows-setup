@@ -47,12 +47,31 @@ cd ~/windows-setup
 
 [Git の最小設定]({{ '/docs/05-DEV-TOOL-CONFIG/' | relative_url }}) で名前とメールアドレスを設定します。続いて認証します。
 
+基盤スクリプトは `~/.local/bin/windows-browser` を配置します。WSL から `powershell.exe` が使え、既存の [`BROWSER` 設定](https://cli.github.com/manual/gh_help_environment)がない場合は、新しいシェルでこの helper を `BROWSER` に設定します。GitHub CLI の認証 URL は Windows の既定ブラウザーで開きます。
+
 ```bash
 gh auth login
 gh auth setup-git
 ```
 
 トークン、SSH 鍵、認証済み設定はこのリポジトリへ保存しません。
+
+### ブラウザーが見つからない場合
+
+`xdg-open,x-www-browser,www-browser,wslview` が見つからないエラーが出た場合は、管理対象の設定を同期し、新しいシェルで確認します。既存の WSL もこの手順で更新できます。
+
+```bash
+cd ~/windows-setup
+git pull --ff-only
+./scripts/wsl/sync-config.sh
+exec bash
+command -v powershell.exe
+windows-browser https://github.com
+gh auth login
+gh auth setup-git
+```
+
+`windows-browser` は HTTP / HTTPS の URL だけを受け取り、Windows PowerShell の `Start-Process` で既定ブラウザーを開きます。[Windows interop](https://learn.microsoft.com/en-us/windows/wsl/filesystems) や `powershell.exe` の PATH が使えない場合は、その設定を確認してください。すぐに認証する場合は、GitHub CLI が表示した URL を Windows のブラウザーで手動で開き、同じ画面に表示されたコードを入力できます。自分で `BROWSER` を指定済みの場合は上書きしません。
 
 ## 4. Node.js / TypeScript
 
