@@ -24,10 +24,11 @@ if ! command -v powershell.exe >/dev/null 2>&1; then
   exit 1
 fi
 
-# Encode the whole command after quoting URL data as a PowerShell literal.
-# Never interpolate a URL into cmd.exe or an unquoted PowerShell expression.
-quoted_url="${url//\'/\'\'}"
-encoded_command="$(printf "\$ProgressPreference = 'SilentlyContinue'; Start-Process -FilePath '%s'" "$quoted_url" |
+# Keep code fixed and URL data separate, including PowerShell smart quotes.
+# shellcheck disable=SC2016
+powershell_command='$ProgressPreference = "SilentlyContinue"; $url = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String([Console]::In.ReadToEnd())); Start-Process -FilePath $url'
+encoded_command="$(printf '%s' "$powershell_command" |
   iconv -f UTF-8 -t UTF-16LE | base64 -w 0)"
-# Windows console applications must not consume a caller's script input.
-powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand "$encoded_command" </dev/null >/dev/null
+# Only the URL's base64 reaches PowerShell stdin, never a caller's script input.
+printf '%s' "$url" | base64 -w 0 |
+  powershell.exe -NoLogo -NoProfile -NonInteractive -EncodedCommand "$encoded_command" >/dev/null
