@@ -37,7 +37,7 @@ Codex は [OpenAI の現行手順](https://learn.chatgpt.com/docs/codex/cli) に
 プロジェクトディレクトリから順に起動し、画面の案内に従います。
 
 ```bash
-cd ~/work/windows-setup
+cd ~/windows-setup
 codex
 claude
 ```

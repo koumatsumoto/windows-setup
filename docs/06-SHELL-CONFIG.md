@@ -44,7 +44,7 @@ Git for Windows / Git Bashを既に導入している場合は、このリポジ
 WSL 基盤の導入済み環境では、リポジトリを更新した後に次を実行します。
 
 ```bash
-cd ~/work/windows-setup
+cd ~/windows-setup
 git pull --ff-only
 ./scripts/wsl/sync-config.sh
 exec bash

@@ -33,16 +33,15 @@ exec bash
 
 ## 2. リポジトリを WSL へ clone する
 
-Git の導入後は Windows の ZIP 展開先ではなく、Linux ファイルシステム内で作業します。
+Git の導入後は Windows の ZIP 展開先ではなく、Linux ファイルシステム内のホーム直下で作業します。このガイドは `~/windows-setup` を標準の配置先にします。
 
 ```bash
-mkdir -p ~/work
-cd ~/work
+cd ~
 git clone https://github.com/koumatsumoto/windows-setup.git
-cd windows-setup
+cd ~/windows-setup
 ```
 
-以後のコマンドはこの WSL 側コピーで実行します。
+以後のコマンドはこの WSL 側コピーで実行します。他のプロジェクトも `~/satellite_system` のようにホーム直下へ clone します。WSL を初期化し直した場合も同じ配置で取得し直すため、端末ごとにパスを変える必要はありません。すでに同名ディレクトリがある場合は内容を確認し、既存の作業を削除・上書きしません。
 
 ## 3. Git と GitHub を設定する
 
