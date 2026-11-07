@@ -35,7 +35,7 @@ decoded="$(printf '%s' "${arguments[4]}" | base64 -d | iconv -f UTF-16LE -t UTF-
 expected='$ProgressPreference = "SilentlyContinue"; $url = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String([Console]::In.ReadToEnd())); Start-Process -FilePath $url'
 [[ "$decoded" == "$expected" ]]
 [[ "$(base64 -d < "$STDIN_CAPTURE")" == "$url" ]]
-for url in "https://example.com/‘;Write-Output INJECTED;#" "https://example.com/’;Write-Output INJECTED;#" "https://example.com/“”;Write-Output INJECTED;#"; do
+for url in $'https://example.com/\u2018;Write-Output INJECTED;#' $'https://example.com/\u2019;Write-Output INJECTED;#' $'https://example.com/\u201c\u201d;Write-Output INJECTED;#'; do
   "$browser" "$url"
   mapfile -d '' -t arguments < "$ARG_CAPTURE"
   [[ "$(printf '%s' "${arguments[4]}" | base64 -d | iconv -f UTF-16LE -t UTF-8)" == "$expected" ]]

@@ -32,7 +32,7 @@ Ruby 3.3 / Bundler がある環境では次を実行します。依存は `vendo
 サイトを起動した状態で、グローバル `playwright-cli` を使います。リポジトリには CLI が生成する skill やブラウザープロファイルを保存しません。
 
 ```bash
-playwright-cli -s=docs-check open http://127.0.0.1:4000
+playwright-cli -s=docs-check open http://127.0.0.1:4000 --browser chromium
 playwright-cli -s=docs-check resize 1440 900
 playwright-cli -s=docs-check screenshot --filename .playwright-cli/docs-desktop.png --full-page
 playwright-cli -s=docs-check resize 390 844

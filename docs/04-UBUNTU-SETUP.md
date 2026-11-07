@@ -135,11 +135,13 @@ npx playwright test
 ```bash
 playwright-cli --version
 playwright-cli --help
-playwright-cli -s=smoke open about:blank
+playwright-cli -s=smoke open about:blank --browser chromium
 playwright-cli -s=smoke close
 ```
 
 特定プロジェクトで生成 skill が必要になった場合だけ、その時点の CLI で `playwright-cli install --skills` を実行します。
+
+`open` では `--browser chromium` を明示し、導入済みの CLI 用 Chromium を使います。省略すると Linux 側の Google Chrome を探す場合があります。
 
 ## 7. read-only 検証
 
